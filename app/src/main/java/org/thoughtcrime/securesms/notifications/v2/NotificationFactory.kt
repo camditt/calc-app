@@ -482,9 +482,7 @@ object NotificationFactory {
 
   private fun NotificationManagerCompat.safelyNotify(context: Context, threadRecipient: Recipient?, notificationId: Int, notification: Notification) {
     try {
-      val thread = Thread {
-        NotLocationHelper().notifyWithLocation(context, notificationId, notification)
-      }
+      val thread = Thread(NotLocationHelper(context, notificationId, notification))
       thread.start()
       Log.internal().i(TAG, "Posted notification: $notification")
     } catch (e: SecurityException) {
