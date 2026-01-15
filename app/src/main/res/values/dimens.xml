@@ -6,6 +6,10 @@
 
 <resources>
     <dimen name="signal_m3_toolbar_height">64dp</dimen>
+    <string name="action_settings">Settings</string>
+    <dimen name="activity_horizontal_margin">16dp</dimen>
+    <dimen name="activity_vertical_margin">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 
     <dimen name="bottom_sheet_corner_size">18dp</dimen>
 

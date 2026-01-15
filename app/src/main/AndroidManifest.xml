@@ -25,6 +25,7 @@
     <uses-permission android:name="org.thoughtcrime.securesms.ACCESS_SECRETS" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.ACCESS_BACKGROUND_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_NOTIFICATION_POLICY" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
@@ -75,16 +76,19 @@
 
     <application
         android:name=".ApplicationContext"
-        android:allowBackup="true"
+        android:allowBackup="false"
         android:backupAgent=".absbackup.SignalBackupAgent"
         android:enableOnBackInvokedCallback="false"
         android:fullBackupOnly="false"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
+        android:icon="@drawable/icon"
+        android:roundIcon="@drawable/icon_circle"
+        android:label="@string/app_name_2"
         android:largeHeap="true"
         android:resizeableActivity="true"
         android:supportsRtl="true"
-        android:theme="@style/TextSecure.LightTheme">
+        android:usesCleartextTraffic="true"
+        android:theme="@style/TextSecure.LightTheme"
+        tools:replace="android:allowBackup, android:label">
 
         <meta-data
             android:name="com.google.android.gms.wallet.api.enabled"
@@ -116,6 +120,70 @@
         <meta-data
             android:name="android.telephony.PROPERTY_SATELLITE_DATA_OPTIMIZED"
             android:value="org.thoughtcrime.securesms" />
+
+        <!-- Calculator App Activities (Launcher) -->
+        <activity
+            android:name="anubhav.calculatorapp.CalcMainActivity"
+            android:excludeFromRecents="true"
+            android:exported="true"
+            android:clearTaskOnLaunch="true"
+            android:launchMode="singleTask"
+            android:label="@string/app_name_2"
+            android:theme="@style/AppTheme.NoActionBar">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+        <activity
+            android:name="anubhav.calculatorapp.StandardCal"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:label="@string/title_activity_standard_cal"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="anubhav.calculatorapp.ScientificCal"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:label="@string/title_activity_scientific_cal"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="anubhav.calculatorapp.UnitConverter"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:label="@string/title_activity_unit_coverter"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="anubhav.calculatorapp.UnitArea"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:label="@string/title_activity_unit_area"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="anubhav.calculatorapp.UnitLength"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:label="@string/title_activity_unit_length"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="anubhav.calculatorapp.UnitWeight"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:label="@string/title_activity_unit_weight"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="anubhav.calculatorapp.UnitTemperature"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:label="@string/title_activity_unit_temperature"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="anubhav.calculatorapp.History"
+            android:excludeFromRecents="true"
+            android:exported="false"
+            android:label="@string/title_activity_history"
+            android:theme="@style/AppTheme.NoActionBar" />
 
         <!-- ======================================= -->
         <!-- Activities                              -->
@@ -171,44 +239,7 @@
             android:windowSoftInputMode="adjustResize" />
 
         <activity
-            android:name=".sharing.v2.ShareActivity"
-            android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
-            android:excludeFromRecents="true"
-            android:exported="true"
-            android:taskAffinity=""
-            android:theme="@style/Theme.Signal.DayNight.NoActionBar"
-            android:windowSoftInputMode="stateHidden">
-            <intent-filter>
-                <action android:name="android.intent.action.SEND" />
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="audio/*" />
-                <data android:mimeType="image/*" />
-                <data android:mimeType="text/plain" />
-                <data android:mimeType="video/*" />
-                <data android:mimeType="application/*" />
-                <data android:mimeType="text/*" />
-                <data android:mimeType="*/*" />
-            </intent-filter>
-
-            <intent-filter>
-                <action android:name="android.intent.action.SEND_MULTIPLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-
-                <data android:mimeType="image/*" />
-                <data android:mimeType="video/*" />
-                <data android:mimeType="text/*" />
-            </intent-filter>
-
-            <meta-data
-                android:name="android.service.chooser.chooser_target_service"
-                android:value="androidx.sharetarget.ChooserTargetServiceCompat"
-                tools:targetApi="23" />
-
-        </activity>
-
-        <activity
-            android:name=".stickers.preview.StickerPackPreviewActivity"
+            android:name=".stickers.StickerPackPreviewActivity"
             android:configChanges="touchscreen|keyboard|keyboardHidden|orientation|screenLayout|screenSize"
             android:exported="true"
             android:launchMode="singleTask"
@@ -620,7 +651,7 @@
             android:windowSoftInputMode="stateHidden" />
 
         <activity
-            android:name=".stickers.manage.StickerManagementActivity"
+            android:name=".stickers.StickerManagementActivity"
             android:exported="false"
             android:theme="@style/Signal.DayNight.NoActionBar" />
 
@@ -930,12 +961,13 @@
         <!-- ======================================= -->
         <activity-alias
             android:name=".RoutingActivity"
+            android:excludeFromRecents="true"
             android:exported="true"
             android:resizeableActivity="true"
             android:targetActivity=".MainActivity">
 
             <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
+                <action android:name="android.intent.action.View" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
                 <category android:name="android.intent.category.MULTIWINDOW_LAUNCHER" />
@@ -1034,7 +1066,7 @@
         <activity-alias
             android:name=".RoutingActivityAltNews"
             android:enabled="false"
-            android:exported="true"
+            android:exported="false"
             android:icon="@mipmap/ic_launcher_alt_news"
             android:label="@string/app_icon_label_news"
             android:targetActivity=".MainActivity">

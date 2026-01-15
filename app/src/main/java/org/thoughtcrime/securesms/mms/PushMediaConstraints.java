@@ -18,8 +18,14 @@ import java.util.Arrays;
 
 public class PushMediaConstraints extends MediaConstraints {
 
-  private static final int KB = 1024;
-  private static final int MB = 1024 * KB;
+  private static final int MAX_IMAGE_DIMEN_LOWMEM = 1024 * 9;
+  private static final int MAX_IMAGE_DIMEN        = 1024 * 10;
+  private static final int KB                     = 1024;
+  private static final int MB                     = 1024 * KB;
+
+  private static final int[] FALLBACKS        = { MAX_IMAGE_DIMEN, 1024, 768, 512 };
+  private static final int[] FALLBACKS_LOWMEM = { MAX_IMAGE_DIMEN_LOWMEM, 512 };
+
 
   private final MediaConfig currentConfig;
 
@@ -29,7 +35,8 @@ public class PushMediaConstraints extends MediaConstraints {
 
   @Override
   public int getImageMaxWidth(Context context) {
-    return currentConfig.imageSizeTargets[0];
+    return MAX_IMAGE_DIMEN;
+    //return currentConfig.imageSizeTargets[0];
   }
 
   @Override
@@ -39,43 +46,45 @@ public class PushMediaConstraints extends MediaConstraints {
 
   @Override
   public int getImageMaxSize(Context context) {
-    return (int) Math.min(currentConfig.maxImageFileSize, getMaxAttachmentSize());
+    //return currentConfig.maxImageFileSize;
+    return 50 * MB;
   }
 
   @Override
   public int[] getImageDimensionTargets(Context context) {
-    return currentConfig.imageSizeTargets;
+    return FALLBACKS;
+    //return currentConfig.imageSizeTargets;
   }
 
   @Override
   public long getGifMaxSize(Context context) {
-    return Math.min(25 * MB, getMaxAttachmentSize());
+    return 75 * MB;
   }
 
   @Override
   public long getVideoMaxSize() {
-    return getMaxAttachmentSize();
+    return 1000 * MB;
   }
 
   @Override
   public long getUncompressedVideoMaxSize(Context context) {
-    return isVideoTranscodeAvailable() ? RemoteConfig.maxSourceTranscodeVideoSizeBytes()
+    return isVideoTranscodeAvailable() ? 1000 * MB
                                        : getVideoMaxSize();
   }
 
   @Override
   public long getCompressedVideoMaxSize(Context context) {
-    return getMaxAttachmentSize();
+    return 500 * MB;
   }
 
   @Override
   public long getAudioMaxSize(Context context) {
-    return getMaxAttachmentSize();
+    return 300 * MB;
   }
 
   @Override
   public long getDocumentMaxSize(Context context) {
-    return getMaxAttachmentSize();
+    return 1000 * MB;
   }
 
   @Override
