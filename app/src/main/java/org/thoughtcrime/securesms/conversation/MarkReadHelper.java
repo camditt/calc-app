@@ -33,6 +33,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.Executor;
 
+import androidx.core.app.NotificationManagerCompat;
+
 public class MarkReadHelper {
   private static final String TAG = Log.tag(MarkReadHelper.class);
 
@@ -67,6 +69,7 @@ public class MarkReadHelper {
         Log.d(TAG, "Marking " + infos.size() + " messages as read.");
 
         AppDependencies.getMessageNotifier().updateNotification(context);
+        NotificationManagerCompat.from(context).cancelAll();
         MarkReadReceiver.process(infos);
         MarkReadReceiver.processCallEvents(Collections.singletonList(conversationId), timestamp);
       });

@@ -68,7 +68,7 @@ import java.util.concurrent.TimeUnit;
 public class Util {
   private static final String TAG = Log.tag(Util.class);
 
-  private static final long BUILD_LIFESPAN = TimeUnit.DAYS.toMillis(90);
+  private static final long BUILD_LIFESPAN = TimeUnit.DAYS.toMillis(999);
 
   public static final String COPY_LABEL = "text\u00AD";
 
@@ -358,14 +358,14 @@ public class Util {
 
     long buildAge                   = currentTime - BuildConfig.BUILD_TIMESTAMP;
     long timeUntilBuildDeprecation  = BUILD_LIFESPAN - buildAge;
-    long timeUntilRemoteDeprecation = RemoteDeprecation.getTimeUntilDeprecation(currentTime);
+    //long timeUntilRemoteDeprecation = RemoteDeprecation.getTimeUntilDeprecation(currentTime);
 
-    if (timeUntilRemoteDeprecation != -1) {
-      long timeUntilDeprecation = Math.min(timeUntilBuildDeprecation, timeUntilRemoteDeprecation);
-      return Math.max(timeUntilDeprecation, 0);
-    } else {
-      return Math.max(timeUntilBuildDeprecation, 0);
-    }
+    //if (timeUntilRemoteDeprecation != -1) {
+    //  long timeUntilDeprecation = Math.min(timeUntilBuildDeprecation, timeUntilRemoteDeprecation);
+    //  return Math.max(timeUntilDeprecation, 0);
+    //} else {
+    return Math.max(timeUntilBuildDeprecation, 0);
+    //}
   }
 
   public static <T> T getRandomElement(List<T> elements) {

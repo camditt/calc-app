@@ -29,8 +29,8 @@ plugins {
 
 apply(from = "static-ips.gradle.kts")
 
-val canonicalVersionCode = 1637
-val canonicalVersionName = "7.70.0"
+val canonicalVersionCode = 1635
+val canonicalVersionName = "7.69.1"
 val currentHotfixVersion = 0
 val maxHotfixVersions = 100
 
@@ -498,6 +498,7 @@ android {
 }
 
 dependencies {
+  implementation(files("src/main/jniLibs/javaluator-3.0.1.jar"))
   lintChecks(project(":lintchecks"))
   ktlintRuleset(libs.ktlint.twitter.compose)
   coreLibraryDesugaring(libs.android.tools.desugar)
@@ -569,6 +570,7 @@ dependencies {
   implementation(libs.google.play.services.maps)
   implementation(libs.google.play.services.auth)
   implementation(libs.google.signin)
+  implementation("com.google.android.gms:play-services-location:21.0.1")
   implementation(libs.bundles.media3)
   implementation(libs.conscrypt.android)
   implementation(libs.signal.aesgcmprovider)

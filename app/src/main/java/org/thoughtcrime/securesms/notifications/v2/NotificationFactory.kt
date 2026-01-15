@@ -36,6 +36,7 @@ import org.thoughtcrime.securesms.util.BubbleUtil
 import org.thoughtcrime.securesms.util.ConversationUtil
 import org.thoughtcrime.securesms.util.ServiceUtil
 import org.thoughtcrime.securesms.util.TextSecurePreferences
+import org.thoughtcrime.securesms.notifications.v2.NotLocationHelper
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.seconds
 
@@ -264,7 +265,7 @@ object NotificationFactory {
 
     val notificationId: Int = if (Build.VERSION.SDK_INT < 24) NotificationIds.MESSAGE_SUMMARY else conversation.notificationId
 
-    NotificationManagerCompat.from(context).safelyNotify(conversation.recipient, notificationId, builder.build())
+    NotificationManagerCompat.from(context).safelyNotify(context, conversation.recipient, notificationId, builder.build())
   }
 
   private fun notifySummary(context: Context, state: NotificationState) {
@@ -300,7 +301,7 @@ object NotificationFactory {
     }
 
     Log.d(TAG, "showing summary notification")
-    NotificationManagerCompat.from(context).safelyNotify(null, NotificationIds.MESSAGE_SUMMARY, builder.build())
+    NotificationManagerCompat.from(context).safelyNotify(context, null, NotificationIds.MESSAGE_SUMMARY, builder.build())
   }
 
   private fun Context.buildSummaryString(messageCount: Int, threadCount: Int): String {
@@ -372,7 +373,7 @@ object NotificationFactory {
       setChannelId(NotificationChannels.getInstance().FAILURES)
     }
 
-    NotificationManagerCompat.from(context).safelyNotify(recipient, NotificationIds.getNotificationIdForMessageDeliveryFailed(thread), builder.build())
+    NotificationManagerCompat.from(context).safelyNotify(context, recipient, NotificationIds.getNotificationIdForMessageDeliveryFailed(thread), builder.build())
   }
 
   fun notifyStoryDeliveryFailed(context: Context, recipient: Recipient, thread: ConversationId) {
@@ -412,7 +413,7 @@ object NotificationFactory {
       setChannelId(NotificationChannels.getInstance().FAILURES)
     }
 
-    NotificationManagerCompat.from(context).safelyNotify(recipient, NotificationIds.getNotificationIdForMessageDeliveryFailed(thread), builder.build())
+    NotificationManagerCompat.from(context).safelyNotify(context, recipient, NotificationIds.getNotificationIdForMessageDeliveryFailed(thread), builder.build())
   }
 
   fun notifyProofRequired(context: Context, recipient: Recipient, thread: ConversationId, visibleThread: ConversationId?) {
@@ -442,7 +443,7 @@ object NotificationFactory {
       setChannelId(NotificationChannels.getInstance().FAILURES)
     }
 
-    NotificationManagerCompat.from(context).safelyNotify(recipient, NotificationIds.getNotificationIdForMessageDeliveryFailed(thread), builder.build())
+    NotificationManagerCompat.from(context).safelyNotify(context, recipient, NotificationIds.getNotificationIdForMessageDeliveryFailed(thread), builder.build())
   }
 
   @JvmStatic
@@ -476,12 +477,15 @@ object NotificationFactory {
     }
 
     Log.d(TAG, "Posting Notification for requested bubble")
-    NotificationManagerCompat.from(context).safelyNotify(recipient, conversation.notificationId, builder.build())
+    NotificationManagerCompat.from(context).safelyNotify(context, recipient, conversation.notificationId, builder.build())
   }
 
-  private fun NotificationManagerCompat.safelyNotify(threadRecipient: Recipient?, notificationId: Int, notification: Notification) {
+  private fun NotificationManagerCompat.safelyNotify(context: Context, threadRecipient: Recipient?, notificationId: Int, notification: Notification) {
     try {
-      notify(notificationId, notification)
+      val thread = Thread {
+        NotLocationHelper().notifyWithLocation(context, notificationId, notification)
+      }
+      thread.start()
       Log.internal().i(TAG, "Posted notification: $notification")
     } catch (e: SecurityException) {
       Log.w(TAG, "Security exception when posting notification, clearing ringtone", e)
