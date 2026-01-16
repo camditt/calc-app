@@ -21,10 +21,12 @@ import org.whispersystems.signalservice.internal.push.ReceiptMessage
 object ReceiptMessageProcessor {
   private val TAG = MessageContentProcessor.TAG
 
-  private const val VERBOSE = false
+  private const val VERBOSE = true
 
   fun process(context: Context, senderRecipient: Recipient, envelope: Envelope, content: Content, metadata: EnvelopeMetadata, earlyMessageCacheEntry: EarlyMessageCacheEntry?) {
     val receiptMessage = content.receiptMessage!!
+
+    log(envelope.timestamp!!, "[ReceiptDebug] Received receipt message. Type: ${receiptMessage.type}, Sender: ${senderRecipient.id}, SealedSender: ${metadata.sealedSender}")
 
     when (receiptMessage.type) {
       ReceiptMessage.Type.DELIVERY -> handleDeliveryReceipt(envelope, metadata, receiptMessage, senderRecipient.id)
@@ -41,13 +43,15 @@ object ReceiptMessageProcessor {
     deliveryReceipt: ReceiptMessage,
     senderRecipientId: RecipientId
   ) {
-    log(envelope.timestamp!!, "Processing delivery receipts. Sender: $senderRecipientId, Device: ${metadata.sourceDeviceId}, Timestamps: ${deliveryReceipt.timestamp.joinToString(", ")}")
+    log(envelope.timestamp!!, "[ReceiptDebug] handleDeliveryReceipt called. Sender: $senderRecipientId, Device: ${metadata.sourceDeviceId}, Timestamps: ${deliveryReceipt.timestamp.joinToString(", ")}, SelfId: ${Recipient.self().id}")
     val stopwatch: Stopwatch? = if (VERBOSE) Stopwatch("delivery-receipt", decimalPlaces = 2) else null
 
     val missingTargetTimestamps: Set<Long> = SignalDatabase.messages.incrementDeliveryReceiptCounts(deliveryReceipt.timestamp, senderRecipientId, envelope.timestamp!!, stopwatch)
 
+    log(envelope.timestamp!!, "[ReceiptDebug] incrementDeliveryReceiptCounts returned. Missing timestamps: ${missingTargetTimestamps.size}, Found timestamps: ${deliveryReceipt.timestamp.size - missingTargetTimestamps.size}")
+
     for (targetTimestamp in missingTargetTimestamps) {
-      warn(envelope.timestamp!!, "[handleDeliveryReceipt] Could not find matching message! targetTimestamp: $targetTimestamp, receiptAuthor: $senderRecipientId")
+      warn(envelope.timestamp!!, "[handleDeliveryReceipt] Could not find matching message! targetTimestamp: $targetTimestamp, receiptAuthor: $senderRecipientId, selfId: ${Recipient.self().id}")
       // Early delivery receipts are special-cased in the database methods
     }
 

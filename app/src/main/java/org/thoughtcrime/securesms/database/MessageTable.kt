@@ -5001,6 +5001,9 @@ open class MessageTable(context: Context?, databaseHelper: SignalDatabase) : Dat
       MessageQualifier.ALL -> ""
     }
 
+    val selfId = Recipient.self().id
+    Log.d(TAG, "[ReceiptDebug] incrementReceiptCountInternal: Looking for message with DATE_SENT=$targetTimestamp, FROM_RECIPIENT_ID=$selfId, TO_RECIPIENT_ID=$receiptAuthor, receiptType=$receiptType")
+
     // Note: While it is true that multiple messages can have the same (sent, author) pair, this should only happen for stories, which are handled below.
     val receiptData: ReceiptData? = readableDatabase
       .select(ID, THREAD_ID, STORY_TYPE, receiptType.columnName, TO_RECIPIENT_ID)
@@ -5010,18 +5013,18 @@ open class MessageTable(context: Context?, databaseHelper: SignalDatabase) : Dat
         $DATE_SENT = $targetTimestamp AND
         $FROM_RECIPIENT_ID = ? AND
         (
-          $TO_RECIPIENT_ID = ? OR 
+          $TO_RECIPIENT_ID = ? OR
           EXISTS (
-            SELECT 1 
-            FROM ${RecipientTable.TABLE_NAME} 
-            WHERE 
-              ${RecipientTable.TABLE_NAME}.${RecipientTable.ID} = $TO_RECIPIENT_ID AND 
+            SELECT 1
+            FROM ${RecipientTable.TABLE_NAME}
+            WHERE
+              ${RecipientTable.TABLE_NAME}.${RecipientTable.ID} = $TO_RECIPIENT_ID AND
               ${RecipientTable.TABLE_NAME}.${RecipientTable.TYPE} != ${RecipientTable.RecipientType.INDIVIDUAL.id}
           )
         )
         $qualifierWhere
         """,
-        Recipient.self().id,
+        selfId,
         receiptAuthor
       )
       .limit(1)
@@ -5039,12 +5042,16 @@ open class MessageTable(context: Context?, databaseHelper: SignalDatabase) : Dat
     stopwatch?.split("receipt-query")
 
     if (receiptData == null) {
+      Log.w(TAG, "[ReceiptDebug] No message found for receipt! targetTimestamp=$targetTimestamp, selfId=$selfId, receiptAuthor=$receiptAuthor")
       if (receiptType == ReceiptType.DELIVERY) {
         earlyDeliveryReceiptCache.increment(targetTimestamp, receiptAuthor, receiptSentTimestamp)
+        Log.d(TAG, "[ReceiptDebug] Added to earlyDeliveryReceiptCache")
       }
 
       return emptySet()
     }
+
+    Log.d(TAG, "[ReceiptDebug] Found message! messageId=${receiptData.messageId}, threadId=${receiptData.threadId}, alreadyMarked=${receiptData.marked}")
 
     if (!receiptData.marked) {
       // We set the receipt_timestamp to the max of the two values because that single column represents the timestamp of the last receipt of any type.

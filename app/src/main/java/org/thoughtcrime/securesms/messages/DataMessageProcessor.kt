@@ -211,8 +211,10 @@ object DataMessageProcessor {
     }
 
     if (metadata.sealedSender && messageId != null) {
+      Log.d(MessageContentProcessor.TAG, "[ReceiptDebug] Enqueuing SendDeliveryReceiptJob for sender=${senderRecipient.id}, timestamp=${message.timestamp}, messageId=$messageId")
       SignalExecutors.BOUNDED.execute { AppDependencies.jobManager.add(SendDeliveryReceiptJob(senderRecipient.id, message.timestamp!!, messageId)) }
     } else if (!metadata.sealedSender) {
+      Log.w(MessageContentProcessor.TAG, "[ReceiptDebug] NOT sending delivery receipt - sealedSender=${metadata.sealedSender}, messageId=$messageId")
       if (RecipientUtil.shouldHaveProfileKey(threadRecipient)) {
         Log.w(MessageContentProcessor.TAG, "Received an unsealed sender message from " + senderRecipient.id + ", but they should already have our profile key. Correcting.")
 
