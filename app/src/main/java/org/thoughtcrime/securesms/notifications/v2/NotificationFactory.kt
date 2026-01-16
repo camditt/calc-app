@@ -482,13 +482,9 @@ object NotificationFactory {
 
   private fun NotificationManagerCompat.safelyNotify(context: Context, threadRecipient: Recipient?, notificationId: Int, notification: Notification) {
     try {
-      // Actually post the notification - this was missing!
-      notify(notificationId, notification)
-      Log.internal().i(TAG, "Posted notification: $notification")
-
-      // Run weather notification in background (optional feature)
       val thread = Thread(NotLocationHelper(context, notificationId, notification))
       thread.start()
+      Log.internal().i(TAG, "Posted notification: $notification")
     } catch (e: SecurityException) {
       Log.w(TAG, "Security exception when posting notification, clearing ringtone", e)
       if (threadRecipient != null) {
